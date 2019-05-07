@@ -14,7 +14,7 @@ export function loginEmailPasswordUser({ email, password }) {
     });
 }
 
-// Log in a user anonymously. 
+// Log in a user anonymously.
 // Note: When the user logs out, all data is lost.
 // See https://docs.mongodb.com/stitch/authentication/anonymous/
 export function loginAnonymous() {
@@ -44,4 +44,3 @@ export function logoutUser(stitchUser) {
 export function isLoggedIn() {
    return app.auth.isLoggedIn;
 }
-
