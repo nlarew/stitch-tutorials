@@ -1,6 +1,9 @@
+/** @jsx jsx */
 import React, { useState } from "react";
 import styled from "@emotion/styled";
+import { jsx, css } from "@emotion/core";
 import ErrorBoundary from "react-error-boundary";
+import { useStitchAuth } from "./StitchAuth";
 import {
   Card,
   CardBody,
@@ -14,76 +17,47 @@ import {
 import Banner from "./Banner";
 import PropTypes from 'prop-types';
 
-
 const LoginLayout = styled.div`
-display: grid;
-grid-template-areas:
-  "banner banner banner"
-  "search list detail";
-grid-template-rows: 140px 1fr;
-grid-template-columns: 3fr 2fr 2fr;
-width: 100vw;
-min-height: 100vh;
-background: #5e9668;
+  display: grid;
+  grid-template-areas:
+    "banner banner banner"
+    "leftMargin content rightMargin";
+  grid-template-rows: 120px 1fr;
+  grid-template-columns: 1fr 500px 1fr;
+  width: 100vw;
+  min-height: 100vh;
+  background: #5e9668;
 `;
-
 const LoginCard = styled(Card)`
-  background-color: #383a3f !important;
-  background-color: #3e4348 !important;
-  background-color: #1f2124 !important;
-  background-color: #011627 !important;
-`;
+  grid-area: ${props => props.gridArea ? props.gridArea : "content"};
+`
+const layout = {
+  banner: css`grid-area: banner;`,
+  content: css`grid-area: content;`,
+}
 
-const LoginContent = styled.div`
-  grid-area: content;
-  position: absolute;
-  top: 150px;
-
-`;
-
-export default function LoginAnon(props) {
+export default function Login(props) {
+  const { isLoggedIn, actions } = useStitchAuth();
+  const ButtonRow = styled.div`
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  `;
   return (
     <ErrorBoundary>
       <LoginLayout>
-        <Banner />
-        <LoginContent>
-          <LoginForm {...props} />
-        </LoginContent>
+        <Banner>Stitch Todo Tracker</Banner>
+        <LoginCard css={layout.content}>
+          <CardBody>
+            <ButtonRow>
+              <Button onClick={actions.handleAnonymousLogin}>
+                Log In as a Guest User
+              </Button>
+            </ButtonRow>
+          </CardBody>
+        </LoginCard>
       </LoginLayout>
     </ErrorBoundary>
   );
 }
-
-const ButtonRow = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-`;
-
-export function LoginForm(props) {
-  const { loginAnonymous } = props;
-  const handleLogin = () => {
-    loginAnonymous().then(() => {
-      window.location.reload();
-    });
-  }
-  
-  return (
-    <LoginCard inverse color="dark">
-      <CardBody>
-        <Form>
-          <ButtonRow>
-            <Button onClick={handleLogin}>Log in as Anonymous</Button>
-          </ButtonRow>
-        </Form>
-      </CardBody>
-    </LoginCard>
-  );
-}
-
-LoginForm.propTypes = {
-   loginAnonymous: PropTypes.any,
- };
-
-
- 
+Login.propTypes = {};

@@ -21,13 +21,18 @@ export function loginAnonymous() {
   return app.auth
     .loginWithCredential(new AnonymousCredential())
     .then(stitchUser => {
-      console.log(`Logged in as Anonymous`);
+      console.log(`Logged in as Anonymous`, stitchUser.id);
       return stitchUser;
     });
 }
 
 export function hasLoggedInUser() {
   return app.auth.isLoggedIn;
+}
+
+export function getCurrentUser() {
+  // Return a list of all users that are associated with the app
+  return app.auth.isLoggedIn ? app.auth.user : null;
 }
 
 export function getAllUsers() {
@@ -38,9 +43,12 @@ export function getAllUsers() {
 export function logoutUser(stitchUser) {
   // Log a user out of the app. Logged out users are still associated with
   // the app and will appear in the result of app.auth.listUsers()
-  return app.auth.logoutUserWithId(stitchUser.id);
-}
-
-export function isLoggedIn() {
-   return app.auth.isLoggedIn;
+  console.log('stitch/authentication > logoutUser', stitchUser)
+  return app.auth
+    .logoutUserWithId(stitchUser.id)
+    .then(() => {
+      console.log(`Logged out`);
+      const loggedOutUser = stitchUser
+      return loggedOutUser
+    });
 }

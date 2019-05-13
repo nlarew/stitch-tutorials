@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from "react";
 import styled from "@emotion/styled";
-import TodoList from "./TodoList";
+import TodoApp from "./TodoListNew";
 import Banner from "./Banner";
 import Navbar from "./Navbar";
 import PropTypes from 'prop-types';
+
+import Login from "./LoginAnon";
+import { app, hasLoggedInUser, loginAnonymous, logoutUser } from "./../stitch";
+import { useStitchAuth, StitchAuthProvider } from "./StitchAuth";
+import { useWhyDidYouUpdate } from "./../utils/useWhyDidYouUpdate";
 
 const AppLayout = styled.div`
   display: grid;
@@ -17,17 +22,31 @@ const AppLayout = styled.div`
   background: #5e9668;
 `;
 
-App.propTypes = {
-  children: PropTypes.node,
+function ApplicationContext(props) {
+  return <StitchAuthProvider>{props.children}</StitchAuthProvider>;
+}
+ApplicationContext.propTypes = {
+  children: PropTypes.element
 };
 
-export default function App(props) {
-  return (
-    <AppLayout>
-      <Banner>
-        <Navbar />
-      </Banner>
-      <TodoList />
-    </AppLayout>
+function AppUI(props) {
+  const { isLoggedIn, actions } = useStitchAuth();
+  
+  return isLoggedIn ? (
+    <TodoApp />
+  ) : (
+    <Login />
   );
 }
+AppUI.propTypes = {};
+
+export default function App() {
+  return (
+    <ApplicationContext>
+      <AppUI />
+    </ApplicationContext>
+  );
+}
+App.propTypes = {
+  children: PropTypes.node
+};
