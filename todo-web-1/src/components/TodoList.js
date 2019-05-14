@@ -36,13 +36,18 @@ const NoTodoItems = props => {
 
   return (
     <Layout>
-      {props.hasHadTodos && (
+      {props.hasHadTodos ? (
         <span>
           <span role="img" aria-label="celebrate">
             {" "}
             🎉{" "}
           </span>
           All done! Enjoy your day!
+        </span>
+      ) : (
+        <span>
+          Enter some text and click <strong>Add</strong> to save your first
+          to-do task
         </span>
       )}
     </Layout>

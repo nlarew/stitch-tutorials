@@ -1,5 +1,5 @@
 // React
-import React from "react"
+import React from "react";
 import styled from "@emotion/styled";
 // Components & Hooks
 import TodoApp from "./TodoApp";
@@ -20,12 +20,13 @@ AppUI.propTypes = {};
 function AppUI() {
   const {
     isLoggedIn,
-    actions: { handleLogout }
+    actions: { handleLogout },
   } = useStitchAuth();
   return (
     <Layout>
       <Navbar>
         {isLoggedIn && <Button onClick={handleLogout}>Logout</Button>}
+        <AppTitle>MongoDB Stitch To-Do Tutorial</AppTitle>
       </Navbar>
       {isLoggedIn ? <TodoApp /> : <Login />}
     </Layout>
@@ -48,4 +49,7 @@ const Navbar = styled.div`
   height: 62px;
   padding: 10px;
   background: #5e9668;
+`;
+const AppTitle = styled.h1`
+  margin-right: auto;
 `;

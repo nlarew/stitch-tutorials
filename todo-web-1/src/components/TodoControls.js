@@ -25,6 +25,7 @@ export default function TodoControls(props) {
       handleAddTodo();
     }
   };
+  const allTodosAreCompleted = items.every(item => item.checked === true);
   return (
     <Layout>
       <TodoInput
@@ -36,7 +37,7 @@ export default function TodoControls(props) {
       <ControlBar>
         {items.length > 0 && (
           <SelectAllButton
-            selected={items.every(item => item.checked === true)}
+            selected={allTodosAreCompleted}
             onClick={actions.completeAllTodos}
           />
         )}
