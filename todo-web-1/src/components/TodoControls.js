@@ -1,60 +1,95 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import styled from "@emotion/styled";
+import { CheckedIcon, UncheckedIcon } from "./Icon";
+import { Button } from "reactstrap";
+import TodoInput from "./TodoInput";
 
 TodoControls.propTypes = {
   items: PropTypes.array,
-  actions: PropTypes.object
+  actions: PropTypes.object,
 };
 export default function TodoControls(props) {
   const { items, actions } = props;
   const [inputText, setInputText] = useState("");
   const hasCheckedItems = items && items.filter(x => x.checked).length > 0;
   const handleInput = e => setInputText(e.target.value);
+  const handleAddTodo = () => {
+    if (inputText) {
+      actions.addTodo(inputText);
+      setInputText("");
+    }
+  };
   const handleKeyPress = e => {
     if (e.key === "Enter") {
-      if (inputText) {
-        actions.addTodo(inputText);
-        setInputText("");
-      }
+      handleAddTodo();
     }
   };
   return (
     <Layout>
-      <Input
-        type="text"
-        placeholder="Add a new item and hit <enter>"
+      <TodoInput
+        value={inputText}
+        addTodo={handleAddTodo}
         onChange={handleInput}
         onKeyDown={handleKeyPress}
-        value={inputText}
       />
-      {hasCheckedItems && (
-        <CleanupButton onClick={actions.clearCompletedTodos}>
-          Clear Completed
-        </CleanupButton>
-      )}
+      <ControlBar>
+        {items.length > 0 && (
+          <SelectAllButton
+            selected={items.every(item => item.checked === true)}
+            onClick={actions.completeAllTodos}
+          />
+        )}
+        {hasCheckedItems && (
+          <CleanupButton onClick={actions.clearCompletedTodos}>
+            Clear Completed
+          </CleanupButton>
+        )}
+      </ControlBar>
     </Layout>
   );
 }
 const Layout = styled.div`
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
   width: 450px;
 `;
-const Input = styled.input`
-  font-size: 1.8em;
+const ControlBar = styled.div`
   width: 100%;
-  border: 1px solid rgba(0,0,0,0.6);
-  padding: 10px;
-  border-radius: 0.25rem;
+  padding: 10px 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
 `;
-const CleanupButton = styled.button`
+const CleanupButton = styled(Button)`
+  background-color: #f83d0e !important;
+`;
+const SelectAllButton = props => {
+  const Selector = styled(Button)`
+    color: black;
+    border: 0.5px solid rgba(0, 0, 0, 0.6) !important;
+    margin-right: 8px;
+  `;
+  return (
+    <Selector color="inverted" onClick={props.onClick}>
+      {props.selected ? (
+        <span>
+          <CheckedIcon />
+        </span>
+      ) : (
+        <span>
+          <UncheckedIcon /> Check All
+        </span>
+      )}
+    </Selector>
+  );
+};
+const CleanupButton2 = styled.button`
   background-color: #f83d0e;
   position: relative;
   border: 1px solid black;
   display: inline-block;
-  margin-left: 30px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
   cursor: pointer;
   :active {

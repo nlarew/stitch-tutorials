@@ -11,10 +11,14 @@ const todoReducer = (state, { type, payload }) => {
       };
     }
     case "addTodo": {
+      const newTodo = {
+        ...payload,
+        checked: typeof payload.checked === "boolean" ? payload.checked : false,
+      };
       return {
         ...state,
         hasHadTodos: true,
-        todos: [...state.todos, payload],
+        todos: [...state.todos, newTodo],
       };
     }
     case "removeTodo": {
@@ -42,6 +46,12 @@ const todoReducer = (state, { type, payload }) => {
       return {
         ...state,
         todos: state.todos.map(updateTodoStatus),
+      };
+    }
+    case "completeAllTodos": {
+      return {
+        ...state,
+        todos: state.todos.map(todo => ({ ...todo, checked: true })),
       };
     }
     case "toggleTodoStatus": {
@@ -93,12 +103,15 @@ export function useTodoItems(userId) {
     );
     dispatch({ type: "setTodoStatus", payload: { todoId, status } });
   };
+  const completeAllTodos = async () => {
+    await items.updateMany({ owner_id: userId }, { $set: { checked: true } });
+    dispatch({ type: "completeAllTodos" });
+  };
   const toggleTodoStatus = async todoId => {
     const todo = state.todos.find(t => t._id === todoId);
     await items.updateOne(
       { _id: todoId },
       { $set: { checked: !todo.currentStatus } },
-      { returnNewDocument: true },
     );
     dispatch({ type: "toggleTodoStatus", payload: { id: todoId } });
   };
@@ -115,6 +128,7 @@ export function useTodoItems(userId) {
       setTodoCompletionStatus,
       clearTodos,
       clearCompletedTodos,
+      completeAllTodos,
       toggleTodoStatus,
     },
   };
