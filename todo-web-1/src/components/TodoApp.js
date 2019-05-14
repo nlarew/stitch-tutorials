@@ -12,7 +12,8 @@ import { Card, CardTitle } from "reactstrap";
 TodoApp.propTypes = {};
 export default function TodoApp() {
   const { currentUser } = useStitchAuth();
-  const { items, actions } = useTodoItems(currentUser.id);
+  const todo = useTodoItems(currentUser.id);
+  // const { items, hasHadTodos, actions } = useTodoItems(currentUser.id);
   return (
     <ErrorBoundary>
       <Layout>
@@ -20,8 +21,8 @@ export default function TodoApp() {
           <Title>
             <h1>Your To-Do List</h1>
           </Title>
-          <TodoControls items={items} actions={actions} />
-          <TodoList items={items} actions={actions} />
+          <TodoControls {...todo} />
+          <TodoList {...todo} />
         </TodoCard>
       </Layout>
     </ErrorBoundary>

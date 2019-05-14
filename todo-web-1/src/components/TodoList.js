@@ -6,44 +6,50 @@ import TodoItem from "./TodoItem";
 
 TodoList.propTypes = {
   items: PropTypes.array,
-  actions: PropTypes.object
+  actions: PropTypes.object,
 };
 export default function TodoList(props) {
-  const { items, actions } = props;
+  const { items, hasHadTodos, actions } = props;
+
   return (
     <ErrorBoundary>
       <List>
-        {items.length === 0 ? (
-          <NoTodoItems>
-            <span role="img" aria-label="celebrate">
-              {" "}
-              🎉
-              {" "}
-            </span>
-            All done!
-            Enjoy your day!
-          </NoTodoItems>
-        ) : (
-          items.map(item => (
-            <TodoItem
-              key={item._id.toString()}
-              item={item}
-              toggleStatus={() => actions.toggleTodoStatus(item._id)}
-            />
-          ))
-        )}
+        {items.length === 0 && <NoTodoItems hasHadTodos={hasHadTodos} />}
+        {items.map(item => (
+          <TodoItem
+            key={item._id.toString()}
+            item={item}
+            toggleStatus={() => actions.toggleTodoStatus(item._id)}
+          />
+        ))}
       </List>
     </ErrorBoundary>
   );
 }
-const NoTodoItems = styled.div`
-  text-align: center;
-  font-size: 2em;
-  padding-top: 60px;
-  padding-bottom: 60px;
-`
+const NoTodoItems = props => {
+  const Layout = styled.div`
+    text-align: center;
+    font-size: 2em;
+    padding-top: 60px;
+    padding-bottom: 60px;
+  `;
+
+  return (
+    <Layout>
+      {props.hasHadTodos && (
+        <span>
+          <span role="img" aria-label="celebrate">
+            {" "}
+            🎉{" "}
+          </span>
+          All done! Enjoy your day!
+        </span>
+      )}
+    </Layout>
+  );
+};
 const List = styled.ul`
   padding: 0;
   margin-top: 10px;
   width: 450px;
-`
+`;

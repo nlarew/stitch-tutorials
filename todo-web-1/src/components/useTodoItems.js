@@ -6,27 +6,29 @@ const todoReducer = (state, { type, payload }) => {
     case "setTodos": {
       return {
         ...state,
-        todos: payload.todos || []
+        hasHadTodos: payload.todos.length > 0,
+        todos: payload.todos || [],
       };
     }
     case "addTodo": {
       return {
         ...state,
-        todos: [...state.todos, payload]
+        hasHadTodos: true,
+        todos: [...state.todos, payload],
       };
     }
     case "removeTodo": {
       const removeSpecifiedTodo = todo => todo.id !== payload.id;
       return {
         ...state,
-        todos: state.todos.filter(removeSpecifiedTodo)
+        todos: state.todos.filter(removeSpecifiedTodo),
       };
     }
     case "clearCompletedTodos": {
       const isNotCompleted = todo => todo.checked !== true;
       return {
         ...state,
-        todos: state.todos.filter(isNotCompleted)
+        todos: state.todos.filter(isNotCompleted),
       };
     }
     case "clearTodos": {
@@ -39,7 +41,7 @@ const todoReducer = (state, { type, payload }) => {
       };
       return {
         ...state,
-        todos: state.todos.map(updateTodoStatus)
+        todos: state.todos.map(updateTodoStatus),
       };
     }
     case "toggleTodoStatus": {
@@ -49,7 +51,7 @@ const todoReducer = (state, { type, payload }) => {
       };
       return {
         ...state,
-        todos: state.todos.map(updateStatus)
+        todos: state.todos.map(updateStatus),
       };
     }
     default: {
@@ -87,7 +89,7 @@ export function useTodoItems(userId) {
     await items.updateOne(
       { _id: todoId },
       { $set: { checked: status } },
-      { returnNewDocument: true }
+      { returnNewDocument: true },
     );
     dispatch({ type: "setTodoStatus", payload: { todoId, status } });
   };
@@ -96,21 +98,24 @@ export function useTodoItems(userId) {
     await items.updateOne(
       { _id: todoId },
       { $set: { checked: !todo.currentStatus } },
-      { returnNewDocument: true }
+      { returnNewDocument: true },
     );
     dispatch({ type: "toggleTodoStatus", payload: { id: todoId } });
   };
 
-  React.useEffect(() => { loadTodos() }, []);
+  React.useEffect(() => {
+    loadTodos();
+  }, []);
   return {
     items: state.todos,
+    hasHadTodos: state.hasHadTodos,
     actions: {
       addTodo,
       removeTodo,
       setTodoCompletionStatus,
       clearTodos,
       clearCompletedTodos,
-      toggleTodoStatus
-    }
+      toggleTodoStatus,
+    },
   };
 }
