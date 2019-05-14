@@ -1,36 +1,33 @@
-import React, { useState, useEffect } from "react";
-import styled from "@emotion/styled";
+import React from "react";
 import PropTypes from "prop-types";
 import { useWhyDidYouUpdate } from "./../utils/useWhyDidYouUpdate";
 import {
-  app,
   hasLoggedInUser,
   loginAnonymous,
   logoutUser,
   getCurrentUser,
-} from "./../stitch";
+} from "./../stitch/authentication";
 
+// Create a React Context that lets us expose and access auth state
+// without passing props through many levels of the component tree
 const StitchAuthContext = React.createContext();
+
+// Create a React Hook that lets us get data from our auth context
 export function useStitchAuth() {
   const context = React.useContext(StitchAuthContext);
-  console.log('useStitchAuth', context)
   if (!context) {
     throw new Error(`useStitchAuth must be used within a StitchAuthProvider`);
   }
   return context;
 }
+
+// Create a component that controls auth state and exposes it via
+// the React Context we created.
 export function StitchAuthProvider(props) {
   const [authState, setAuthState] = React.useState({
-    isLoggedIn: false,
-    currentUser: null,
+    isLoggedIn: hasLoggedInUser(),
+    currentUser: getCurrentUser(),
   });
-  useEffect(() => {
-    console.log('initializing')
-    setAuthState({
-      isLoggedIn: hasLoggedInUser(),
-      currentUser: getCurrentUser(),
-    });
-  }, [])
   useWhyDidYouUpdate('StitchAuthProvider', { ...authState })
 
   // Authentication Actions
@@ -38,7 +35,6 @@ export function StitchAuthProvider(props) {
     const { isLoggedIn } = authState;
     if (!isLoggedIn) {
       const loggedInUser = await loginAnonymous();
-      console.log("onUserLoggedIn", loggedInUser);
       setAuthState({
         ...authState,
         isLoggedIn: true,
@@ -49,8 +45,7 @@ export function StitchAuthProvider(props) {
   const handleLogout = async () => {
     const { isLoggedIn, currentUser } = authState;
     if (isLoggedIn) {
-      const loggedOutUser = await logoutUser(currentUser);
-      console.log("onUserLoggedOut", loggedOutUser);
+      await logoutUser(currentUser);
       setAuthState({
         ...authState,
         isLoggedIn: false,
@@ -69,7 +64,6 @@ export function StitchAuthProvider(props) {
       currentUser,
       actions: { handleAnonymousLogin, handleLogout }
     };
-    console.log("authInfo", value);
     return value;
   }, [authState.isLoggedIn]);
   return (

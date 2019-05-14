@@ -1,52 +1,51 @@
-import React, { useState, useEffect } from "react";
+// React
+import React from "react"
 import styled from "@emotion/styled";
-import TodoApp from "./TodoListNew";
-import Banner from "./Banner";
-import Navbar from "./Navbar";
-import PropTypes from 'prop-types';
+// Components & Hooks
+import TodoApp from "./TodoApp";
+import Login from "./Login";
+import { StitchAuthProvider, useStitchAuth } from "./StitchAuth";
+import { Button } from "reactstrap";
 
-import Login from "./LoginAnon";
-import { app, hasLoggedInUser, loginAnonymous, logoutUser } from "./../stitch";
-import { useStitchAuth, StitchAuthProvider } from "./StitchAuth";
-import { useWhyDidYouUpdate } from "./../utils/useWhyDidYouUpdate";
-
-const AppLayout = styled.div`
-  display: grid;
-  grid-template-areas:
-    "banner banner banner"
-    "search list detail";
-  grid-template-rows: 140px 1fr;
-  grid-template-columns: 5fr 1fr;
-  width: 100vw;
-  min-height: 100vh;
-  background: #5e9668;
-`;
-
-function ApplicationContext(props) {
-  return <StitchAuthProvider>{props.children}</StitchAuthProvider>;
-}
-ApplicationContext.propTypes = {
-  children: PropTypes.element
-};
-
-function AppUI(props) {
-  const { isLoggedIn, actions } = useStitchAuth();
-  
-  return isLoggedIn ? (
-    <TodoApp />
-  ) : (
-    <Login />
-  );
-}
-AppUI.propTypes = {};
-
+App.propTypes = {};
 export default function App() {
   return (
-    <ApplicationContext>
+    <StitchAuthProvider>
       <AppUI />
-    </ApplicationContext>
+    </StitchAuthProvider>
   );
 }
-App.propTypes = {
-  children: PropTypes.node
-};
+
+AppUI.propTypes = {};
+function AppUI() {
+  const {
+    isLoggedIn,
+    actions: { handleLogout }
+  } = useStitchAuth();
+  return (
+    <Layout>
+      <Navbar>
+        {isLoggedIn && <Button onClick={handleLogout}>Logout</Button>}
+      </Navbar>
+      {isLoggedIn ? <TodoApp /> : <Login />}
+    </Layout>
+  );
+}
+const Layout = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  * {
+    font-family: sans-serif;
+  }
+`;
+const Navbar = styled.div`
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  width: 100%;
+  height: 62px;
+  padding: 10px;
+  background: #5e9668;
+`;

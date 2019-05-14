@@ -1,7 +1,5 @@
-import React, { useState } from "react";
-import TodoItem from "./TodoItem";
-import { useStitchAuth } from "./StitchAuth";
-import { app, items } from "../stitch";
+import React from "react";
+import { items } from "../stitch";
 
 const todoReducer = (state, { type, payload }) => {
   switch (type) {
@@ -25,7 +23,7 @@ const todoReducer = (state, { type, payload }) => {
       };
     }
     case "clearCompletedTodos": {
-      const isNotCompleted = todo => todo.checked !== true
+      const isNotCompleted = todo => todo.checked !== true;
       return {
         ...state,
         todos: state.todos.filter(isNotCompleted)
@@ -38,7 +36,7 @@ const todoReducer = (state, { type, payload }) => {
       const updateTodoStatus = todo => {
         const isThisTodo = todo._id === payload.id;
         return isThisTodo ? { ...todo, status: payload.status } : todo;
-      }
+      };
       return {
         ...state,
         todos: state.todos.map(updateTodoStatus)
@@ -48,20 +46,21 @@ const todoReducer = (state, { type, payload }) => {
       const updateStatus = todo => {
         const isThisTodo = todo._id === payload.id;
         return isThisTodo ? { ...todo, checked: !todo.checked } : todo;
-      }
+      };
       return {
         ...state,
         todos: state.todos.map(updateStatus)
       };
     }
     default: {
+      console.error(`Received invalid todo action type: ${type}`);
     }
   }
 };
 
-function useTodoItems(userId) {
+export function useTodoItems(userId) {
+  //
   const [state, dispatch] = React.useReducer(todoReducer, { todos: [] });
-
   // Todo Actions
   const loadTodos = async () => {
     const todos = await items.find({}, { limit: 1000 }).asArray();
@@ -92,7 +91,7 @@ function useTodoItems(userId) {
     );
     dispatch({ type: "setTodoStatus", payload: { todoId, status } });
   };
-  const toggleTodoStatus = async (todoId) => {
+  const toggleTodoStatus = async todoId => {
     const todo = state.todos.find(t => t._id === todoId);
     await items.updateOne(
       { _id: todoId },
@@ -102,10 +101,7 @@ function useTodoItems(userId) {
     dispatch({ type: "toggleTodoStatus", payload: { id: todoId } });
   };
 
-  React.useEffect(() => {
-    loadTodos();
-  }, []);
-
+  React.useEffect(() => { loadTodos() }, []);
   return {
     items: state.todos,
     actions: {
@@ -114,82 +110,7 @@ function useTodoItems(userId) {
       setTodoCompletionStatus,
       clearTodos,
       clearCompletedTodos,
-      toggleTodoStatus,
+      toggleTodoStatus
     }
   };
 }
-
-function TodoControls(props) {
-  const { items, actions } = props;
-  const [inputText, setInputText] = useState("");
-  const handleInput = e => setInputText(e.target.value);
-  const handleKeyPress = e => {
-    if (e.key === "Enter") {
-      if(inputText) {
-        actions.addTodo(inputText);
-        setInputText("")
-      }
-    }
-  };
-  return (
-    <div className="controls">
-      <input
-        type="text"
-        className="new-item"
-        placeholder="Add a new item and hit <enter>"
-        onChange={handleInput}
-        onKeyDown={handleKeyPress}
-        value={inputText}
-      />
-      {items && items.filter(x => x.checked).length > 0 ? (
-        <button
-          className="cleanup-button"
-          onClick={actions.clearCompletedTodos}
-        >
-          Clear Completed
-        </button>
-      ) : null}
-    </div>
-  );
-}
-
-function TodoList(props) {
-  const { items, actions } = props;
-  // Calculated Properties
-  return items.length === 0 ? (
-    <div>No Todo Items :(</div>
-  ) : (
-    <ul className="items-list">
-      {items.map(item => (
-        <TodoItem
-          key={item._id.toString()}
-          item={item}
-          remove={() => actions.removeTodo(item._id)}
-          toggleStatus={() => actions.toggleTodoStatus(item._id)}
-          setStatus={status =>
-            actions.setTodoCompletionStatus(item._id, status)
-          }
-        />
-      ))}
-    </ul>
-  );
-}
-
-function TodoApp(props) {
-  // const auth = useStitchAuth();
-  // const todo = useTodoItems(auth.currentUser.id);
-  const {
-    currentUser,
-    actions: { handleLogout }
-  } = useStitchAuth();
-  const todo = useTodoItems(currentUser.id);
-  return (
-    <div>
-      <button onClick={handleLogout}>logout</button>
-      <TodoControls items={todo.items} actions={todo.actions} />
-      <TodoList items={todo.items} actions={todo.actions} />
-    </div>
-  );
-}
-
-export default TodoApp;

@@ -4,11 +4,13 @@ module.exports = {
         "es6": true
     },
     'extends': [
+        "eslint:recommended",
         'plugin:react/recommended'
     ],
     "globals": {
         "Atomics": "readonly",
-        "SharedArrayBuffer": "readonly"
+        "SharedArrayBuffer": "readonly",
+        "React": "readonly"
     },
     "parserOptions": {
         "ecmaFeatures": {
@@ -22,5 +24,6 @@ module.exports = {
     ],
     "rules": {
         'no-console': 'off',
+        "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
     }
 };

@@ -1,6 +1,8 @@
-import { useState, useEffect } from "react";
-import { UserPasswordCredential, AnonymousCredential } from "mongodb-stitch-browser-sdk";
-import {app}  from "./stitch.js";
+import { app }  from "./stitch.js";
+import {
+  UserPasswordCredential,
+  AnonymousCredential
+} from "mongodb-stitch-browser-sdk";
 
 // Log in a user with the specified email and password
 // Note: The user must already be registered with the Stitch app.
