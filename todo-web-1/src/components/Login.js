@@ -2,11 +2,7 @@ import React from "react";
 import styled from "@emotion/styled";
 import ErrorBoundary from "react-error-boundary";
 import { useStitchAuth } from "./StitchAuth";
-import {
-  Card,
-  CardBody,
-  Button,
-} from "reactstrap";
+import { Card, CardBody, Button } from "reactstrap";
 
 Login.propTypes = {};
 export default function Login() {
@@ -39,7 +35,7 @@ const LoginCard = styled(Card)`
 `;
 const LoginButton = styled(Button)`
   margin-top: 10px;
-  :first-child {
+  :first-of-type {
     margin-top: 0px;
   }
 `;
